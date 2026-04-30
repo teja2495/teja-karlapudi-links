@@ -452,6 +452,24 @@
     .label small{ display:none }
   }
 
+  /* ─── cursor spotlight ─── */
+  body::after{
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle 80px at var(--mx, -9999px) var(--my, -9999px),
+      color-mix(in srgb, var(--accent) 18%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 8%, transparent) 45%,
+      color-mix(in srgb, var(--accent) 0%, transparent) 100%
+    );
+    opacity: 0;
+    transition: opacity .5s ease;
+  }
+  body.glow-active::after{ opacity: 1 }
+  @media (hover: none){ body::after{ display: none } }
+
   /* ─── animations ─── */
   @media (prefers-reduced-motion: no-preference){
     @media (min-width:601px){
@@ -536,6 +554,28 @@
 </main>
 
 <script>
+  (function(){
+    if(window.matchMedia('(hover: none)').matches) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const body = document.body;
+    let mx = 0, my = 0, gx = 0, gy = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      body.classList.add('glow-active');
+    });
+    document.addEventListener('mouseleave', () => body.classList.remove('glow-active'));
+
+    const ease = reduced ? 1 : 0.12;
+    (function tick(){
+      gx += (mx - gx) * ease;
+      gy += (my - gy) * ease;
+      body.style.setProperty('--mx', gx + 'px');
+      body.style.setProperty('--my', gy + 'px');
+      requestAnimationFrame(tick);
+    })();
+  })();
+
   (function(){
     const light = ['mint', 'sunset', 'lavender', 'ocean', 'rose'];
     const dark  = ['midnight', 'charcoal', 'forest'];
