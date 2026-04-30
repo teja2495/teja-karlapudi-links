@@ -560,11 +560,24 @@
     const body = document.body;
     let mx = 0, my = 0, gx = 0, gy = 0;
 
+    const card = document.querySelector('.card');
+    let overCard = false;
+
     document.addEventListener('mousemove', e => {
       mx = e.clientX; my = e.clientY;
-      body.classList.add('glow-active');
+      if(!overCard) body.classList.add('glow-active');
     });
-    document.addEventListener('mouseleave', () => body.classList.remove('glow-active'));
+    card.addEventListener('mouseenter', () => {
+      overCard = true;
+      body.classList.remove('glow-active');
+      body.style.setProperty('--mx', '-9999px');
+      body.style.setProperty('--my', '-9999px');
+    });
+    card.addEventListener('mouseleave', () => { overCard = false; });
+    document.addEventListener('mouseleave', () => {
+      overCard = false;
+      body.classList.remove('glow-active');
+    });
 
     const ease = reduced ? 1 : 0.12;
     (function tick(){
